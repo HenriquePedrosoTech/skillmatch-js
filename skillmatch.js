@@ -54,6 +54,16 @@ class VagaRemota extends Vaga {
   }
 }
 
+function classificarCompatibilidade(percentual) {
+  if (percentual >= 80) {
+    return "Alta compatibilidade";
+  } else if (percentual >= 50) {
+    return "Média compatibilidade";
+  } else {
+    return "Baixa compatibilidade";
+  }
+}
+
 const vagas = [
   new Vaga(1, "Tech Floripa", "Desenvolvedor Fullstack Jr", "presencial", [
     "HTML",
@@ -77,5 +87,6 @@ const vagas = [
     "UTC-3",
   ),
 ];
+
 
 vagas.forEach((vaga) => console.log(vaga.resumo()));
