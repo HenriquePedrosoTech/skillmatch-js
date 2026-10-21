@@ -63,3 +63,5 @@ const vagas = [
   ),
 ];
 
+vagas.forEach((vaga) => console.log(vaga.resumo()));
+
