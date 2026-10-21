@@ -26,6 +26,21 @@ class Vaga {
   resumo() {
     return `${this.cargo} na ${this.empresa} (${this.modalidade})`;
   }
+
+  habilidadesQueTem(habilidadesCandidato) {
+    return this.requisitos.filter((req) =>
+      habilidadesCandidato.includes(req)
+    );
+  }
+
+  habilidadesFaltantes(habilidadesCandidato) {
+    return this.requisitos.filter((req) => !habilidadesCandidato.includes(req));
+  }
+
+  calcularCompatibilidade(habilidadesCandidato) {
+    const tem = this.habilidadesQueTem(habilidadesCandidato).length;
+    return (tem / this.requisitos.length) * 100;
+  }
 }
 
 class VagaRemota extends Vaga {
@@ -64,4 +79,3 @@ const vagas = [
 ];
 
 vagas.forEach((vaga) => console.log(vaga.resumo()));
-
