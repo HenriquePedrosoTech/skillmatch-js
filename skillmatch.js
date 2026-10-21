@@ -26,6 +26,19 @@ class Vaga {
   resumo() {
     return `${this.cargo} na ${this.empresa} (${this.modalidade})`;
   }
+
+  habilidadesQueTem(habilidadesCandidato) {
+    return this.requisitos.filter((req) => habilidadesCandidato.includes(req));
+  }
+
+  habilidadesFaltantes(habilidadesCandidato) {
+    return this.requisitos.filter((req) => !habilidadesCandidato.includes(req));
+  }
+
+  calcularCompatibilidade(habilidadesCandidato) {
+    const tem = this.habilidadesQueTem(habilidadesCandidato).length;
+    return (tem / this.requisitos.length) * 100;
+  }
 }
 
 class VagaRemota extends Vaga {
@@ -36,6 +49,16 @@ class VagaRemota extends Vaga {
 
   resumo() {
     return `${super.resumo()} - Fuso: ${this.fusoHorario}`;
+  }
+}
+
+function classificarCompatibilidade(percentual) {
+  if (percentual >= 80) {
+    return "Alta compatibilidade";
+  } else if (percentual >= 50) {
+    return "Média compatibilidade";
+  } else {
+    return "Baixa compatibilidade";
   }
 }
 
@@ -63,5 +86,19 @@ const vagas = [
   ),
 ];
 
-vagas.forEach((vaga) => console.log(vaga.resumo()));
+const resultados = vagas.map((vaga) => {
+  const percentual = vaga.calcularCompatibilidade(candidato.habilidades);
+  return {
+    vaga: vaga,
+    percentual: percentual,
+    classificacao: classificarCompatibilidade(percentual),
+    faltantes: vaga.habilidadesFaltantes(candidato.habilidades),
+  };
+});
 
+for (const r of resultados) {
+  console.log("-----------------------------");
+  console.log(r.vaga.resumo());
+  console.log(`Compatibilidade: ${r.percentual}% - ${r.classificacao}`);
+  console.log(`Faltam: ${r.faltantes.join(", ")}`);
+}
