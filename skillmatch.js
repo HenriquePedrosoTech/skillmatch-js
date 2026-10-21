@@ -28,9 +28,7 @@ class Vaga {
   }
 
   habilidadesQueTem(habilidadesCandidato) {
-    return this.requisitos.filter((req) =>
-      habilidadesCandidato.includes(req)
-    );
+    return this.requisitos.filter((req) => habilidadesCandidato.includes(req));
   }
 
   habilidadesFaltantes(habilidadesCandidato) {
@@ -88,5 +86,19 @@ const vagas = [
   ),
 ];
 
+const resultados = vagas.map((vaga) => {
+  const percentual = vaga.calcularCompatibilidade(candidato.habilidades);
+  return {
+    vaga: vaga,
+    percentual: percentual,
+    classificacao: classificarCompatibilidade(percentual),
+    faltantes: vaga.habilidadesFaltantes(candidato.habilidades),
+  };
+});
 
-vagas.forEach((vaga) => console.log(vaga.resumo()));
+for (const r of resultados) {
+  console.log("-----------------------------");
+  console.log(r.vaga.resumo());
+  console.log(`Compatibilidade: ${r.percentual}% - ${r.classificacao}`);
+  console.log(`Faltam: ${r.faltantes.join(", ")}`);
+}
