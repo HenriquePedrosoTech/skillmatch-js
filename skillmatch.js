@@ -62,6 +62,20 @@ function classificarCompatibilidade(percentual) {
   }
 }
 
+function exibirResultados(lista, formatar) {
+  for (const r of lista) {
+    console.log(formatar(r));
+  }
+}
+
+function criarContador() {
+  let total = 0;
+  return function () {
+    total++;
+    return total;
+  };
+}
+
 function buscarVagas() {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -104,6 +118,8 @@ async function main() {
     const vagas = await buscarVagas();
     console.log("Vagas carregadas!");
 
+    const contarVaga = criarContador();
+
     const resultados = vagas.map((vaga) => {
       const percentual = vaga.calcularCompatibilidade(candidato.habilidades);
       return {
@@ -114,12 +130,11 @@ async function main() {
       };
     });
 
-    for (const r of resultados) {
-      console.log("-----------------------------");
-      console.log(r.vaga.resumo());
-      console.log(`Compatibilidade: ${r.percentual}% - ${r.classificacao}`);
-      console.log(`Faltam: ${r.faltantes.join(", ")}`);
-    }
+    exibirResultados(
+      resultados,
+      (r) =>
+        `-----------------------------\nVaga analisada nº ${contarVaga()}\n${r.vaga.resumo()}\nCompatibilidade: ${r.percentual}% - ${r.classificacao}\nFaltam: ${r.faltantes.join(", ")}`,
+    );
 
     const melhor = resultados.reduce((melhorAteAgora, atual) => {
       return atual.percentual > melhorAteAgora.percentual
