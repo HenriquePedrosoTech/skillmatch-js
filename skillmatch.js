@@ -62,68 +62,96 @@ function classificarCompatibilidade(percentual) {
   }
 }
 
-const vagas = [
-  new Vaga(1, "Tech Floripa", "Desenvolvedor Fullstack Jr", "presencial", [
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "Git",
-    "React",
-  ]),
-  new VagaRemota(
-    2,
-    "Web Solutions",
-    "Desenvolvedor Fullstack Jr",
-    ["HTML", "CSS", "JavaScript", "TypeScript", "Figma"],
-    "UTC-3",
-  ),
-  new VagaRemota(
-    3,
-    "Hcode",
-    "Desenvolvedor Fullstack Pleno",
-    ["JavaScript", "TypeScript", "Next.js", "Jest", "Docker"],
-    "UTC-3",
-  ),
-];
-const resultados = vagas.map((vaga) => {
-  const percentual = vaga.calcularCompatibilidade(candidato.habilidades);
-  return {
-    vaga: vaga,
-    percentual: percentual,
-    classificacao: classificarCompatibilidade(percentual),
-    faltantes: vaga.habilidadesFaltantes(candidato.habilidades),
-  };
-});
+function buscarVagas() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const sucesso = true;
 
-for (const r of resultados) {
-  console.log("-----------------------------");
-  console.log(r.vaga.resumo());
-  console.log(`Compatibilidade: ${r.percentual}% - ${r.classificacao}`);
-  console.log(`Faltam: ${r.faltantes.join(", ")}`);
+      if (sucesso) {
+        resolve([
+          new Vaga(
+            1,
+            "Tech Floripa",
+            "Desenvolvedor Fullstack Jr",
+            "presencial",
+            ["HTML", "CSS", "JavaScript", "Git", "React"],
+          ),
+          new VagaRemota(
+            2,
+            "Web Solutions",
+            "Desenvolvedor Fullstack Jr",
+            ["HTML", "CSS", "JavaScript", "TypeScript", "Figma"],
+            "UTC-3",
+          ),
+          new VagaRemota(
+            3,
+            "Hcode",
+            "Desenvolvedor Fullstack Pleno",
+            ["JavaScript", "TypeScript", "Next.js", "Jest", "Docker"],
+            "UTC-3",
+          ),
+        ]);
+      } else {
+        reject(new Error("Falha ao carregar as vagas do servidor"));
+      }
+    }, 2000);
+  });
 }
 
-const melhor = resultados.reduce((melhorAteAgora, atual) => {
-  return atual.percentual > melhorAteAgora.percentual ? atual : melhorAteAgora;
-});
+async function main() {
+  try {
+    console.log("Carregando vagas do servidor...");
+    const vagas = await buscarVagas();
+    console.log("Vagas carregadas!");
 
-console.log("=============================");
-console.log(`Vaga mais compatível: ${melhor.vaga.resumo()}`);
-console.log(`Compatibilidade: ${melhor.percentual}%`);
+    const resultados = vagas.map((vaga) => {
+      const percentual = vaga.calcularCompatibilidade(candidato.habilidades);
+      return {
+        vaga: vaga,
+        percentual: percentual,
+        classificacao: classificarCompatibilidade(percentual),
+        faltantes: vaga.habilidadesFaltantes(candidato.habilidades),
+      };
+    });
 
-const contagem = {};
+    for (const r of resultados) {
+      console.log("-----------------------------");
+      console.log(r.vaga.resumo());
+      console.log(`Compatibilidade: ${r.percentual}% - ${r.classificacao}`);
+      console.log(`Faltam: ${r.faltantes.join(", ")}`);
+    }
 
-for (const r of resultados) {
-  for (const habilidade of r.faltantes) {
-    contagem[habilidade] = (contagem[habilidade] || 0) + 1;
+    const melhor = resultados.reduce((melhorAteAgora, atual) => {
+      return atual.percentual > melhorAteAgora.percentual
+        ? atual
+        : melhorAteAgora;
+    });
+
+    console.log("=============================");
+    console.log(`Vaga mais compatível: ${melhor.vaga.resumo()}`);
+    console.log(`Compatibilidade: ${melhor.percentual}%`);
+
+    const contagem = {};
+
+    for (const r of resultados) {
+      for (const habilidade of r.faltantes) {
+        contagem[habilidade] = (contagem[habilidade] || 0) + 1;
+      }
+    }
+
+    const prioridades = Object.entries(contagem)
+      .sort((a, b) => b[1] - a[1])
+      .map(
+        ([habilidade, qtd]) =>
+          `${habilidade} (${qtd} vaga${qtd > 1 ? "s" : ""})`,
+      );
+
+    console.log("=============================");
+    console.log("Recomendação de estudo (da maior para a menor prioridade):");
+    prioridades.forEach((item, i) => console.log(`${i + 1}. ${item}`));
+  } catch (erro) {
+    console.log(`Erro: ${erro.message}`);
   }
 }
 
-const prioridades = Object.entries(contagem)
-  .sort((a, b) => b[1] - a[1])
-  .map(
-    ([habilidade, qtd]) => `${habilidade} (${qtd} vaga${qtd > 1 ? "s" : ""})`,
-  );
-
-console.log("=============================");
-console.log("Recomendação de estudo (da maior para a menor prioridade):");
-prioridades.forEach((item, i) => console.log(`${i + 1}. ${item}`));
+main();
