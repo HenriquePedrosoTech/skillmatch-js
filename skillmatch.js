@@ -96,6 +96,15 @@ const resultados = vagas.map((vaga) => {
   };
 });
 
+const melhor = resultados.reduce((melhorAteAgora, atual) => {
+  return atual.percentual > melhorAteAgora.percentual ? atual : melhorAteAgora;
+});
+
+console.log("=============================");
+console.log(`Vaga mais compatível: ${melhor.vaga.resumo()}`);
+console.log(`Compatibilidade: ${melhor.percentual}%`);
+
+
 for (const r of resultados) {
   console.log("-----------------------------");
   console.log(r.vaga.resumo());
