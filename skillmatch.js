@@ -85,7 +85,6 @@ const vagas = [
     "UTC-3",
   ),
 ];
-
 const resultados = vagas.map((vaga) => {
   const percentual = vaga.calcularCompatibilidade(candidato.habilidades);
   return {
@@ -102,3 +101,29 @@ for (const r of resultados) {
   console.log(`Compatibilidade: ${r.percentual}% - ${r.classificacao}`);
   console.log(`Faltam: ${r.faltantes.join(", ")}`);
 }
+
+const melhor = resultados.reduce((melhorAteAgora, atual) => {
+  return atual.percentual > melhorAteAgora.percentual ? atual : melhorAteAgora;
+});
+
+console.log("=============================");
+console.log(`Vaga mais compatível: ${melhor.vaga.resumo()}`);
+console.log(`Compatibilidade: ${melhor.percentual}%`);
+
+const contagem = {};
+
+for (const r of resultados) {
+  for (const habilidade of r.faltantes) {
+    contagem[habilidade] = (contagem[habilidade] || 0) + 1;
+  }
+}
+
+const prioridades = Object.entries(contagem)
+  .sort((a, b) => b[1] - a[1])
+  .map(
+    ([habilidade, qtd]) => `${habilidade} (${qtd} vaga${qtd > 1 ? "s" : ""})`,
+  );
+
+console.log("=============================");
+console.log("Recomendação de estudo (da maior para a menor prioridade):");
+prioridades.forEach((item, i) => console.log(`${i + 1}. ${item}`));
